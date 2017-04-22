@@ -107,7 +107,7 @@ public class Main {
                         start();
                     }
                     int idx = indexFile.getValue();
-                    if (idx >= getMemberCount()) {
+                    if (idx >= getShuffleCount()) {
                         sendText(replyToken, "抽選終了です\n");
                     } else {
                         try (BufferedReader bur = Files.newBufferedReader(SHUFFLE_PATH)) {
@@ -118,7 +118,7 @@ public class Main {
                                     String.format("%sさんと%sさんがペアです！", name[0], name[1]), 
                                     sticker[0], sticker[1]);
                         }
-                        indexFile.setValue((idx + 1) % getMemberCount());
+                        indexFile.setValue((idx + 1) % getShuffleCount());
                     }
             } else if ("開始".equals(command) || "start".equalsIgnoreCase(command)) {
                 start();
@@ -177,6 +177,13 @@ public class Main {
 
     private int getMemberCount() throws IOException {
         try (InputStream is = getMemberFileInput();
+             BufferedReader bur = new BufferedReader(new InputStreamReader(is))) {
+            return (int) bur.lines().filter(s -> !s.isEmpty()).count();
+        }
+    }
+    
+    private int getShuffleCount() throws IOException {
+        try (InputStream is = Files.newInputStream(SHUFFLE_PATH);
              BufferedReader bur = new BufferedReader(new InputStreamReader(is))) {
             return (int) bur.lines().filter(s -> !s.isEmpty()).count();
         }
