@@ -115,7 +115,7 @@ public class Main {
                             String[] name = names.split(",");
                             int[] sticker = STICKERS[idx % STICKERS.length];
                             sendTextAndSticker(replyToken,
-                                    String.format("%sさんと%sさんがペアです！", name[0], name[1]), 
+                                    String.format("%sさんと %sさんがペアです！", name[0], name[1]), 
                                     sticker[0], sticker[1]);
                         }
                         indexFile.setValue(idx + 1);
