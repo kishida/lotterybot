@@ -118,7 +118,7 @@ public class Main {
                                     String.format("%sさんと%sさんがペアです！", name[0], name[1]), 
                                     sticker[0], sticker[1]);
                         }
-                        indexFile.setValue((idx + 1) % getShuffleCount());
+                        indexFile.setValue(idx + 1);
                     }
             } else if ("開始".equals(command) || "start".equalsIgnoreCase(command)) {
                 start();
