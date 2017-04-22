@@ -8,6 +8,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -106,13 +107,19 @@ public class Main {
                         start();
                     }
                     int idx = indexFile.getValue();
-                    try (BufferedReader bur = Files.newBufferedReader(SHUFFLE_PATH)) {
-                        String name = bur.lines().skip(idx).findFirst().get();
-                        int[] sticker = STICKERS[idx % STICKERS.length];
-                        sendTextAndSticker(replyToken, name + "さん、おめでとうございます！", sticker[0], sticker[1]);
+                    if (idx >= getMemberCount()) {
+                        sendText(replyToken, "抽選終了です");
+                    } else {
+                        try (BufferedReader bur = Files.newBufferedReader(SHUFFLE_PATH)) {
+                            String names = bur.lines().skip(idx).findFirst().get();
+                            String[] name = names.split(",");
+                            int[] sticker = STICKERS[idx % STICKERS.length];
+                            sendTextAndSticker(replyToken,
+                                    String.format("%sさんと%sさんがペアです！", name[0], name[1]), 
+                                    sticker[0], sticker[1]);
+                        }
+                        indexFile.setValue((idx + 1) % getMemberCount());
                     }
-
-                    indexFile.setValue((idx + 1) % getMemberCount());
             } else if ("開始".equals(command) || "start".equalsIgnoreCase(command)) {
                 start();
                 sendTextAndSticker(replyToken, "抽選開始!!", 2, 45);
@@ -132,12 +139,31 @@ public class Main {
         }
         try (InputStream is = getMemberFileInput();
              BufferedReader bur = new BufferedReader(new InputStreamReader(is))) {
-            List<String> members = bur.lines()
+            List<String> lines = bur.lines()
                     .filter(s -> !s.isEmpty())
                     .map(s -> s.replaceAll("\t", " ").replaceAll("　", " "))
                     .collect(Collectors.toList());
-            Collections.shuffle(members);
-            Files.write(SHUFFLE_PATH, members);
+            
+            List<List<String>> members = new ArrayList();
+            List<String> list = new ArrayList<>();
+            for (String m : lines) {
+                if (m.startsWith("--")) {
+                    members.add(list);
+                    list = new ArrayList<>();
+                } else {
+                    list.add(m);
+                }
+            }
+            members.add(list);
+            
+            members.forEach(Collections::shuffle);
+            List<String> pairs = new ArrayList<>();
+            for (List<String> member : members) {
+                for (int i = 0; i < member.size(); i += 2) {
+                    pairs.add(String.format("%s,%s", member.get(i), member.get(i + 1)));
+                }
+            }
+            Files.write(SHUFFLE_PATH, pairs);
 
             indexFile.reset();
             skipFile.reset();
