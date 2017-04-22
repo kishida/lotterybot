@@ -108,7 +108,7 @@ public class Main {
                     }
                     int idx = indexFile.getValue();
                     if (idx >= getMemberCount()) {
-                        sendText(replyToken, "抽選終了です");
+                        sendText(replyToken, "抽選終了です\n");
                     } else {
                         try (BufferedReader bur = Files.newBufferedReader(SHUFFLE_PATH)) {
                             String names = bur.lines().skip(idx).findFirst().get();
@@ -171,6 +171,7 @@ public class Main {
                 pairs.add(String.format("%s,%s", member.get(i), member.get(i + 1)));
             }
         }
+        Collections.shuffle(pairs);
         return pairs;
     }
 
