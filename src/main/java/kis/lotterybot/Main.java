@@ -144,31 +144,36 @@ public class Main {
                     .map(s -> s.replaceAll("\t", " ").replaceAll("　", " "))
                     .collect(Collectors.toList());
             
-            List<List<String>> members = new ArrayList();
-            List<String> list = new ArrayList<>();
-            for (String m : lines) {
-                if (m.startsWith("--")) {
-                    members.add(list);
-                    list = new ArrayList<>();
-                } else {
-                    list.add(m);
-                }
-            }
-            members.add(list);
-            
-            members.forEach(Collections::shuffle);
-            List<String> pairs = new ArrayList<>();
-            for (List<String> member : members) {
-                for (int i = 0; i < member.size(); i += 2) {
-                    pairs.add(String.format("%s,%s", member.get(i), member.get(i + 1)));
-                }
-            }
+            List<String> pairs = createPairs(lines);
             Files.write(SHUFFLE_PATH, pairs);
 
             indexFile.reset();
             skipFile.reset();
         }
     }
+
+    static List<String> createPairs(List<String> lines) {
+        List<List<String>> members = new ArrayList();
+        List<String> list = new ArrayList<>();
+        for (String m : lines) {
+            if (m.startsWith("--")) {
+                members.add(list);
+                list = new ArrayList<>();
+            } else {
+                list.add(m);
+            }
+        }
+        members.add(list);
+        members.forEach(Collections::shuffle);
+        List<String> pairs = new ArrayList<>();
+        for (List<String> member : members) {
+            for (int i = 0; i < member.size() - 1; i += 2) {
+                pairs.add(String.format("%s,%s", member.get(i), member.get(i + 1)));
+            }
+        }
+        return pairs;
+    }
+
     private int getMemberCount() throws IOException {
         try (InputStream is = getMemberFileInput();
              BufferedReader bur = new BufferedReader(new InputStreamReader(is))) {
