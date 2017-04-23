@@ -97,7 +97,7 @@ public class Main {
                         "使い方\n"
                         + "開始(start):最初から\n"
                         + "抽選(sel):抽選します\n"
-                        + "人数(count):参加人数\n"
+                        + "人数(count):組み合わせ数\n"
                 );
             } else if ("抽選".equals(command) || "sel".equalsIgnoreCase(command)) {
                     if (!Files.exists(ROOT_PATH)) {
@@ -115,7 +115,7 @@ public class Main {
                             String[] name = names.split(",");
                             int[] sticker = STICKERS[idx % STICKERS.length];
                             sendTextAndSticker(replyToken,
-                                    String.format("%sさんと %sさんがペアです！", name[0], name[1]), 
+                                    String.format("%sと %sがペアです！", name[0], name[1]), 
                                     sticker[0], sticker[1]);
                         }
                         indexFile.setValue(idx + 1);
@@ -124,7 +124,7 @@ public class Main {
                 start();
                 sendTextAndSticker(replyToken, "抽選開始!!", 2, 45);
             } else if ("人数".equals(command) || "count".equalsIgnoreCase(command)) {
-                sendText(replyToken, String.format("%d人参加です！", getMemberCount()));
+                sendText(replyToken, String.format("%d組できます！", getShuffleCount()));
             } else {
                 // do nothing
             }
