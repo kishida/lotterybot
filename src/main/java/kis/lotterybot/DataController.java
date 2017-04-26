@@ -3,6 +3,7 @@ package kis.lotterybot;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,7 +28,7 @@ public class DataController {
         if (!Files.exists(parent)) {
             Files.createDirectories(parent);
         }
-        Files.copy(input.getInputStream(), Main.MEMBER_PATH);
+        Files.copy(input.getInputStream(), Main.MEMBER_PATH, StandardCopyOption.REPLACE_EXISTING);
         return "uploaded";
     }
 }
